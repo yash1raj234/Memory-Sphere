@@ -29,7 +29,7 @@ function CameraController({ zoomLevel }: { zoomLevel: number }) {
 function AnimatedCard({ isPlaceholder, url, color, spherePos, sphereRot, gridPos, gridRot, layoutMode, delay }: any) {
   const groupRef = useRef<THREE.Group>(null);
   const [activeMode, setActiveMode] = useState(layoutMode);
-  
+
   // Conditionally load texture if not placeholder
   const texture = !isPlaceholder ? useTexture(url) : null;
   const { gl } = useThree();
@@ -44,11 +44,12 @@ function AnimatedCard({ isPlaceholder, url, color, spherePos, sphereRot, gridPos
   useEffect(() => {
     // Enable max anisotropy for incredibly crisp images at steep spherical angles
     if (texture && gl) {
-      texture.anisotropy = gl.capabilities.getMaxAnisotropy();
-      texture.minFilter = THREE.LinearMipMapLinearFilter;
-      texture.magFilter = THREE.LinearFilter;
-      texture.colorSpace = THREE.SRGBColorSpace;
-      texture.needsUpdate = true;
+      const tex = texture as THREE.Texture;
+      tex.anisotropy = gl.capabilities.getMaxAnisotropy();
+      tex.minFilter = THREE.LinearMipMapLinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.needsUpdate = true;
     }
   }, [texture, gl]);
 
@@ -64,7 +65,7 @@ function AnimatedCard({ isPlaceholder, url, color, spherePos, sphereRot, gridPos
     if (groupRef.current) {
       const targetP = activeMode === 'sphere' ? spherePosVec : gridPosVec;
       const targetQ = activeMode === 'sphere' ? sphereQuat : gridQuat;
-      
+
       groupRef.current.position.lerp(targetP, 0.06);
       groupRef.current.quaternion.slerp(targetQ, 0.06);
     }
@@ -77,7 +78,7 @@ function AnimatedCard({ isPlaceholder, url, color, spherePos, sphereRot, gridPos
         <planeGeometry args={[0.42, 0.57]} />
         <meshBasicMaterial color="#ffffff" side={THREE.DoubleSide} />
       </mesh>
-      
+
       {/* Front Photo */}
       <mesh position={[0, 0, 0.015]}>
         <planeGeometry args={[0.4, 0.55]} />
@@ -124,7 +125,7 @@ function SceneContent({ photos, targetRotation, targetPan, layoutMode }: Omit<Ph
 
   const items = useMemo(() => {
     const points = fibonacciSphere(PHOTO_COUNT, SPHERE_RADIUS);
-    
+
     // Grid settings
     const GRID_COLS = 15;
     const SPACING_X = 0.45;
@@ -149,7 +150,7 @@ function SceneContent({ photos, targetRotation, targetPan, layoutMode }: Omit<Ph
       const gridY = -Math.floor(i / GRID_COLS) * SPACING_Y + height / 2;
       const gridZ = (Math.random() - 0.5) * 0.2; // Slight crumpled depth
       const gridPosition = [gridX, gridY, gridZ];
-      
+
       // Slight random rotation for crumpled paper look
       const gridRotZ = THREE.MathUtils.degToRad((Math.random() - 0.5) * 10);
       const gridRotY = THREE.MathUtils.degToRad((Math.random() - 0.5) * 15);
@@ -157,7 +158,7 @@ function SceneContent({ photos, targetRotation, targetPan, layoutMode }: Omit<Ph
       const gridRotation = [gridRotX, gridRotY, gridRotZ];
 
       const actualUrl = photos.length > 0 ? photos[i % photos.length] : null;
-      
+
       // Random delay between 0 and 800ms for staggered animation
       const delay = Math.random() * 800;
 
@@ -178,7 +179,7 @@ function SceneContent({ photos, targetRotation, targetPan, layoutMode }: Omit<Ph
   return (
     <group ref={groupRef}>
       {items.map((item) => (
-        <AnimatedCard 
+        <AnimatedCard
           key={`card-${item.id}-${item.url || 'placeholder'}`}
           {...item}
           layoutMode={layoutMode}
@@ -195,15 +196,15 @@ export function PhotoSphere({ photos, targetRotation, targetPan, zoomLevel, layo
         <color attach="background" args={['#000000']} />
         <ambientLight intensity={1.5} />
         <pointLight position={[10, 10, 10]} intensity={1} />
-        
+
         <CameraController zoomLevel={zoomLevel} />
-        
+
         <React.Suspense fallback={null}>
-          <SceneContent 
-            photos={photos} 
-            targetRotation={targetRotation} 
+          <SceneContent
+            photos={photos}
+            targetRotation={targetRotation}
             targetPan={targetPan}
-            layoutMode={layoutMode} 
+            layoutMode={layoutMode}
           />
         </React.Suspense>
       </Canvas>
