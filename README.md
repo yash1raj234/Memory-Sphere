@@ -5,7 +5,8 @@ Hey everyone! This is **MemorySphere** – a project I built to change how we lo
 It's a fully 3D, gesture-driven photo gallery that runs entirely in your browser. You upload your photos, and they dynamically map themselves to the inside of a massive 3D sphere. The coolest part? You control the entire thing with your hands using your webcam. No mouse, no keyboard.
 
 
-### [ Insert a video demo of the hand gestures here! ]
+
+
 
 
 
@@ -49,11 +50,7 @@ I ran into huge memory leaks and crashes early on.
 
 ---
 
-## Want to run it locally?
+## Check it out at -> memory-sphere-nine.vercel.app
 
-1. Clone the repo
-2. Run `npm install`
-3. Run `npm run dev`
-4. Open `http://localhost:3000` in your browser, grant camera permissions, and start waving!
 
 Feel free to fork it, break it, or add new gestures!
